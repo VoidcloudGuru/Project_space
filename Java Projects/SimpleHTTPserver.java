@@ -18,14 +18,16 @@ public class SimpleHTTPserver {
         while (true) {
             //
             try (Socket socket = server.accept()) {
-                InputStreamReader isr =  new InputStreamReader(socket.getInputStream());
-                    BufferedReader reader = new BufferedReader(isr);
-                    String line = reader.readLine();            
-                    while (!line.isEmpty()) {
-                        System.out.println(line);
-                        line = reader.readLine();
-                    }
-                    
+
+                // reads HTTP requests and prints them to the terminal
+                InputStreamReader isr = new InputStreamReader(socket.getInputStream());
+                BufferedReader reader = new BufferedReader(isr);
+                String line = reader.readLine();
+                while (!line.isEmpty()) {
+                    System.out.println(line);
+                    line = reader.readLine();
+                }
+                // sends a response to the http client with date and message
                 Date today = new Date();
                 String httpResponse = "HTTP/1.1 200 OK\r\n\r\n" + today + " Welcome";
                 socket.getOutputStream().write(httpResponse.getBytes("UTF-8"));
