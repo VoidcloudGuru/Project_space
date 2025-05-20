@@ -1,31 +1,36 @@
 #include <stdio.h>
 double result;
 
-double add(double a, double b){
+double add(double a, double b)
+{
     result = a + b;
 
     return result;
 }
 
-double subtract(double a, double b){
+double subtract(double a, double b)
+{
     result = a - b;
 
     return result;
 }
 
-double multiply(double a, double b){
+double multiply(double a, double b)
+{
     result = a * b;
 
     return result;
 }
 
-double divide( double a, double b){
+double divide(double a, double b)
+{
     result = a / b;
 
     return result;
 }
 
-int main(){
+int main()
+{
     double no_1;
     double no_2;
     char operator;
@@ -33,7 +38,7 @@ int main(){
     printf("Enter first number to calculate\n");
     scanf("%lf", &no_1);
 
-    //operators
+    // operators
     printf("Operators to use +,*, -, /  \n");
     printf("Input an operator of your choice\n");
     getchar();
@@ -51,16 +56,16 @@ int main(){
         break;
 
     case '-':
-    subtract(no_1, no_2);
-    printf("The answer is %.2lf \n", result);
+        subtract(no_1, no_2);
+        printf("The answer is %.2lf \n", result);
 
     case '*':
-    multiply(no_1, no_2);
-    printf("The answer is %.2lf \n", result);
+        multiply(no_1, no_2);
+        printf("The answer is %.2lf \n", result);
 
     case '/':
-    divide(no_1, no_2);
-    printf("The answer is %.2lf\n", result);
+        divide(no_1, no_2);
+        printf("The answer is %.2lf\n", result);
 
     default:
         break;
