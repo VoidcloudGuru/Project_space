@@ -9,12 +9,10 @@ from . import data
 from . import diff
 from . import remote
 
-
 def main ():
     with data.change_git_dir ('.'):
         args = parse_args ()
         args.func (args)
-
 
 def parse_args ():
     parser = argparse.ArgumentParser ()
@@ -134,13 +132,11 @@ def read_tree (args):
 def commit (args):
     print (base.commit (args.message))
 
-
 def _print_commit (oid, commit, refs=None):
-    refs_str = f' ({", ".join (refs)})' if refs else ''
+    refs_str =f'({",".join (refs)})' if refs else ''
     print (f'commit {oid}{refs_str}\n')
-    print (textwrap.indent (commit.message, '    '))
+    print (textwrap.indent (commit.message, '   '))
     print ('')
-
 
 def log (args):
     refs = {}
@@ -151,8 +147,7 @@ def log (args):
         commit = base.get_commit (oid)
         _print_commit (oid, commit, refs.get (oid))
 
-
-def show (args):
+def show (args): #show the commit message with diffs
     if not args.oid:
         return
     commit = base.get_commit (args.oid)
@@ -166,24 +161,24 @@ def show (args):
     sys.stdout.flush ()
     sys.stdout.buffer.write (result)
 
-
+# compares the current working tree to a commit tree
 def _diff (args):
     oid = args.commit and base.get_oid (args.commit)
 
     if args.commit:
-        # If a commit was provided explicitly, diff from it
+        # if a commit was provided explicitly, diff from it (compare it)
         tree_from = base.get_tree (oid and base.get_commit (oid).tree)
 
     if args.cached:
         tree_to = base.get_index_tree ()
         if not args.commit:
-            # If no commit was provided, diff from HEAD
+            # if no commit was provided, diff from HEAD
             oid = base.get_oid ('@')
             tree_from = base.get_tree (oid and base.get_commit (oid).tree)
     else:
         tree_to = base.get_working_tree ()
         if not args.commit:
-            # If no commit was provided, diff from index
+            # if no commit was provided, diff from index
             tree_from = base.get_index_tree ()
 
     result = diff.diff_trees (tree_from, tree_to)
@@ -198,7 +193,6 @@ def checkout (args):
 def tag (args):
     base.create_tag (args.name, args.oid)
 
-
 def branch (args):
     if not args.name:
         current = base.get_branch_name ()
@@ -208,7 +202,6 @@ def branch (args):
     else:
         base.create_branch (args.name, args.start_point)
         print (f'Branch {args.name} created at {args.start_point[:10]}')
-
 
 def k (args):
     dot = 'digraph commits {\n'
@@ -225,7 +218,6 @@ def k (args):
         dot += f'"{oid}" [shape=box style=filled label="{oid[:10]}"]\n'
         for parent in commit.parents:
             dot += f'"{oid}" -> "{parent}"\n'
-
     dot += '}'
     print (dot)
 
@@ -233,7 +225,6 @@ def k (args):
             ['dot', '-Tgtk', '/dev/stdin'],
             stdin=subprocess.PIPE) as proc:
         proc.communicate (dot.encode ())
-
 
 def status (args):
     HEAD = base.get_oid ('@')
@@ -247,9 +238,10 @@ def status (args):
     if MERGE_HEAD:
         print (f'Merging with {MERGE_HEAD[:10]}')
 
-    print ('\nChanges to be committed:\n')
+# it will list changed files without listing the full diff
+    print ('\nChanges to be committed:\n') 
     HEAD_tree = HEAD and base.get_commit (HEAD).tree
-    for path, action in diff.iter_changed_files (base.get_tree (HEAD_tree),
+    for path, action in diff.iter_changes_files (base.get_tree (HEAD_tree),
                                                  base.get_index_tree ()):
         print (f'{action:>12}: {path}')
 
@@ -262,22 +254,18 @@ def status (args):
 def reset (args):
     base.reset (args.commit)
 
-
 def merge (args):
     base.merge (args.commit)
 
-
+# it will receive two commit OIDs and find their common ancestor(parent)
 def merge_base (args):
     print (base.get_merge_base (args.commit1, args.commit2))
-
 
 def fetch (args):
     remote.fetch (args.remote)
 
-
 def push (args):
     remote.push (args.remote, f'refs/heads/{args.branch}')
-
 
 def add (args):
     base.add (args.files)

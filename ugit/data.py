@@ -10,7 +10,7 @@ from contextlib import contextmanager
 # Will be initialized in cli.main()
 GIT_DIR = None
 
-
+# allows changing of the current directory
 @contextmanager
 def change_git_dir (new_dir):
     global GIT_DIR
@@ -19,20 +19,17 @@ def change_git_dir (new_dir):
     yield
     GIT_DIR = old_dir
 
-
 def init ():
     os.makedirs (GIT_DIR)
     os.makedirs (f'{GIT_DIR}/objects')
 
-
-RefValue = namedtuple ('RefValue', ['symbolic', 'value'])
-
+RefValue = namedtuple('RefValue', ['symbolic', 'value'])
 
 def update_ref (ref, value, deref=True):
     ref = _get_ref_internal (ref, deref)[0]
 
     assert value.value
-    if value.symbolic:
+    if value.symbolic: #can write a symbolic value
         value = f'ref: {value.value}'
     else:
         value = value.value
@@ -42,31 +39,28 @@ def update_ref (ref, value, deref=True):
     with open (ref_path, 'w') as f:
         f.write (value)
 
-
 def get_ref (ref, deref=True):
     return _get_ref_internal (ref, deref)[1]
 
-
+# removes an exixting ref
 def delete_ref (ref, deref=True):
     ref = _get_ref_internal (ref, deref)[0]
     os.remove (f'{GIT_DIR}/{ref}')
 
-
 def _get_ref_internal (ref, deref):
     ref_path = f'{GIT_DIR}/{ref}'
-    value = None
+    value = None 
     if os.path.isfile (ref_path):
         with open (ref_path) as f:
-            value = f.read ().strip ()
-
+            value = f.read ().strip()
+    
     symbolic = bool (value) and value.startswith ('ref:')
     if symbolic:
         value = value.split (':', 1)[1].strip ()
         if deref:
             return _get_ref_internal (value, deref=True)
-
+    
     return ref, RefValue (symbolic=symbolic, value=value)
-
 
 def iter_refs (prefix='', deref=True):
     refs = ['HEAD', 'MERGE_HEAD']
@@ -81,7 +75,6 @@ def iter_refs (prefix='', deref=True):
         if ref.value:
             yield refname, ref
 
-
 @contextmanager
 def get_index ():
     index = {}
@@ -93,7 +86,6 @@ def get_index ():
 
     with open (f'{GIT_DIR}/index', 'w') as f:
         json.dump (index, f)
-
 
 def hash_object (data, type_='blob'):
     obj = type_.encode () + b'\x00' + data
@@ -114,11 +106,10 @@ def get_object (oid, expected='blob'):
         assert type_ == expected, f'Expected {expected}, got {type_}'
     return content
 
-
 def object_exists (oid):
     return os.path.isfile (f'{GIT_DIR}/objects/{oid}')
 
-
+# copies the remote objects from a remote repository by OID
 def fetch_object_if_missing (oid, remote_git_dir):
     if object_exists (oid):
         return
@@ -126,9 +117,8 @@ def fetch_object_if_missing (oid, remote_git_dir):
     shutil.copy (f'{remote_git_dir}/objects/{oid}',
                  f'{GIT_DIR}/objects/{oid}')
 
-
+# this copies a local object to a remote repository
 def push_object (oid, remote_git_dir):
     remote_git_dir += '/.ugit'
     shutil.copy (f'{GIT_DIR}/objects/{oid}',
                  f'{remote_git_dir}/objects/{oid}')
-
