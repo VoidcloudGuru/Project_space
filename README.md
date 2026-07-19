@@ -15,4 +15,7 @@
 
 ## C_Projects
 * Created a simple calculator
-* Created a simple banking system that allows input of user account details and later allows them to make transactions and also check for the balance in their accounts. 
+* Created a simple banking system that allows input of user account details and later allows them to make transactions and also check for the balance in their accounts.
+
+## Scripts
+* This includes python scripts that are meant to automate specified tasks as explained i the readmes.
