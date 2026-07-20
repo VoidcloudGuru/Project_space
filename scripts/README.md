@@ -1,4 +1,7 @@
 ## **Script Description**
+Usage Example:
+
+python clean.py <filename.csv>
 
 This Python script automates the process of handling missing values in a CSV and Excel datasets. It reads a dataset provided through the command line, verifies that the file exists and then ensres that it is in a supported format (`.csv`, `.xlsx` or `.xls`).
 
